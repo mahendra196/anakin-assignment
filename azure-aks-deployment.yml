@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brand-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: brand-service
+  template:
+    metadata:
+      labels:
+        app: brand-service
+    spec:
+      containers:
+        - name: brand-serviced
+          image: mahendraccr.azurecr.io/mahendra196/anakin-assignment:#{Build.BuildId}#
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+# service type loadbalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: brand-service
+    k8s-app: brand-service
+  name: brand-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: brand-service
