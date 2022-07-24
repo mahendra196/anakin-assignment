@@ -1,7 +1,9 @@
 package com.anakin.entities;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +28,9 @@ public class Product {
     private String imageUrl;
     private Date mfgDate;
     private Date expDate;
+    @CreationTimestamp
     private Date dateAdded;
+    @UpdateTimestamp
     private Date dateUpdated;
     private Integer brandId;
 
