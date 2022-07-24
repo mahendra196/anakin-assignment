@@ -7,6 +7,6 @@ import java.util.List;
 
 @Service
 public interface ProductService {
-    List<Product> getAllProducts();
+    List<Product> getAllProducts(Integer pageNo);
     List<Product> getAllProductsForBrand(Integer brandId);
 }

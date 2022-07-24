@@ -1,6 +1,8 @@
 package com.anakin.services.impl;
 
 import com.anakin.entities.*;
+import com.anakin.models.ProductSellingStoresDetails;
+import com.anakin.models.StoreWithPromotionDTO;
 import com.anakin.payloads.requests.AddProductToStoreRequest;
 import com.anakin.payloads.requests.AddStoreProductPromotionRequest;
 import com.anakin.payloads.responses.AddProductToStoreResponse;
@@ -10,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class StoreServiceImpl implements StoreService {
@@ -35,50 +39,64 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public List<Store> getProductSellingStore(Integer productId, Integer pageNo) {
-        List<Store> storeList = new ArrayList<>();
+    public ProductSellingStoresDetails getProductSellingStore(Integer productId, Integer pageNo) {
+        List<StoreWithPromotionDTO> storeList = new ArrayList<>();
         Integer pageSize = 20;
         Product product = productRepository.findById(productId).get();
         if (product != null) {
             Pageable page = PageRequest.of(pageNo, pageSize);
             List<StoreAndProductRelation> list = storeAndProductRelationRepository.findAllByProduct(product, page);
-            for(StoreAndProductRelation storeAndProductRelation:list){
-                storeList.add(storeAndProductRelation.getStore());
+            for (StoreAndProductRelation storeAndProductRelation : list) {
+                List<StoreAndProductPromotionRelation> storeAndProductPromotionRelationList = storeAndProductPromotionRelationRepository
+                        .getByStoreAndProductRelation(storeAndProductRelation.getId());
+                if (!CollectionUtils.isEmpty(storeAndProductPromotionRelationList)) {
+                    storeList.add(new StoreWithPromotionDTO(storeAndProductRelation.getStore(), storeAndProductPromotionRelationList.get(0).getPromotion()));
+                } else {
+                    storeList.add(new StoreWithPromotionDTO(storeAndProductRelation.getStore(), null));
+                }
+
             }
         }
-        return storeList;
+        return new ProductSellingStoresDetails(product, storeList);
     }
 
     @Override
-    public List<Store> getProductNotSellingStore(Integer productId, Integer pageNo){
-        List<Store> storeList = new ArrayList<>();
+    public List<Store> getProductNotSellingStore(Integer productId, Integer pageNo) {
         Integer pageSize = 20;
-        Integer offset = pageNo * pageSize;
+        Pageable page = PageRequest.of(pageNo, pageSize);
         Product product = productRepository.findById(productId).get();
-        if (product != null) {
-            Pageable page = PageRequest.of(pageNo, pageSize);
-            List<StoreAndProductRelation> list = storeAndProductRelationRepository.findAllByProductIsNotLike(product, page);
-            for(StoreAndProductRelation storeAndProductRelation:list){
-                storeList.add(storeAndProductRelation.getStore());
-            }
+        List<Integer> sellingStore = storeAndProductRelationRepository.findSellingStoreId(productId);
+        if(CollectionUtils.isEmpty(sellingStore)){
+            return storeRepository.findAll(page).toList();
         }
-        return storeList;
+        return storeRepository.findAllByStoreIdNotIn(sellingStore, page);
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
     public AddProductToStoreResponse addProduct(AddProductToStoreRequest addProductToStoreRequest) {
         AddProductToStoreResponse addProductToStoreResponse = null;
-        Store store = storeRepository.findById(addProductToStoreRequest.getStoreId()).get();
-        Product product = productRepository.findById(addProductToStoreRequest.getProductId()).get();
-        if (store != null && product != null) {
-            StoreAndProductRelation storeAndProductRelation = new StoreAndProductRelation();
-            storeAndProductRelation.setProduct(product);
-            storeAndProductRelation.setStore(store);
-            storeAndProductRelation.setStatusId(1);
-            storeAndProductRelation = storeAndProductRelationRepository.save(storeAndProductRelation);
-            addProductToStoreResponse = new AddProductToStoreResponse(storeAndProductRelation);
+        Optional<Store> store = storeRepository.findById(addProductToStoreRequest.getStoreId());
+        Optional<Product> product = productRepository.findById(addProductToStoreRequest.getProductId());
+        if (store.isPresent() && product.isPresent()) {
+            StoreAndProductRelation tmp = storeAndProductRelationRepository.findByProductAndStoreAndStatusId(product.get(), store.get(), 1);
+
+            if (tmp == null) {
+                StoreAndProductRelation storeAndProductRelation = new StoreAndProductRelation();
+                storeAndProductRelation.setProduct(product.get());
+                storeAndProductRelation.setStore(store.get());
+                storeAndProductRelation.setStatusId(1);
+                storeAndProductRelation = storeAndProductRelationRepository.save(storeAndProductRelation);
+                addProductToStoreResponse = new AddProductToStoreResponse(storeAndProductRelation);
+            }
+            else{
+                // TODO: add throw exception
+            }
         }
+        else{
+            // TODO: add throw exception
+        }
+
         return addProductToStoreResponse;
     }
 

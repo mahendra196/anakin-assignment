@@ -1,7 +1,9 @@
 package com.anakin.entities;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +32,9 @@ public class Promotion {
     private Double discountFixed;
     private Date startDate;
     private Date endDate;
+    @CreationTimestamp
     private Date dateAdded;
+    @UpdateTimestamp
     private Date dateUpdated;
     private Integer statusId;
 

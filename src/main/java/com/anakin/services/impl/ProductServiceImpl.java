@@ -6,6 +6,8 @@ import com.anakin.repositories.BrandRepository;
 import com.anakin.repositories.ProductRepository;
 import com.anakin.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,8 +19,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     BrandRepository brandRepository;
     @Override
-    public List<Product> getAllProducts(){
-        return productRepository.findAll();
+    public List<Product> getAllProducts(Integer pageNo){
+        Pageable page = PageRequest.of(pageNo, 20);
+        return productRepository.findAll(page).toList();
     }
 
     @Override
