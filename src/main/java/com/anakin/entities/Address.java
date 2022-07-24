@@ -1,6 +1,8 @@
 package com.anakin.entities;
 
+import com.anakin.models.AddressDTO;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
@@ -26,8 +28,18 @@ public class Address {
     private String state;
     private String country;
     private String pinCode;
+    @CreationTimestamp
     private Date dateAdded;
+    @CreationTimestamp
     private Date dateUpdated;
+
+    public Address(AddressDTO addressDTO){
+        this.addressLine1=addressDTO.getAddressLine1();
+        this.addressLine2=addressDTO.getAddressLine2();
+        this.city=addressDTO.getCity();
+        this.state=addressDTO.getState();
+        this.pinCode=addressDTO.getPinCode();
+    }
 
 }
 

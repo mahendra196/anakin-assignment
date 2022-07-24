@@ -2,7 +2,9 @@ package com.anakin.controllers;
 
 import com.anakin.entities.Product;
 import com.anakin.entities.Retailer;
+import com.anakin.entities.Store;
 import com.anakin.services.ProductService;
+import com.anakin.services.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,8 @@ import java.util.List;
 public class ProductController {
     @Autowired
     ProductService productService;
+    @Autowired
+    StoreService storeService;
 
     @GetMapping("/all")
     List<Product> getAllProducts(){
@@ -20,13 +24,13 @@ public class ProductController {
     }
 
     @GetMapping("/seller/stores")
-    List<Retailer> getAllSellerStoresForProduct(@RequestParam Integer productId){
-        return null;
+    List<Store> getAllSellerStoresForProduct(@RequestHeader(name = "Authorization") String authToken, @RequestParam Integer productId, @RequestParam Integer pageNo){
+        return storeService.getProductSellingStore(productId, pageNo);
     }
 
     @GetMapping("/non-seller/stores")
-    List<Retailer> getAllNonSellerStoresForProduct(@RequestParam Integer productId){
-        return null;
+    List<Store> getAllNonSellerStoresForProduct(@RequestHeader(name = "Authorization") String authToken, @RequestParam Integer productId, @RequestParam Integer pageNo){
+        return storeService.getProductNotSellingStore(productId,pageNo);
     }
 
 }

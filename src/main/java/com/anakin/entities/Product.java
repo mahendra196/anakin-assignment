@@ -1,14 +1,13 @@
 package com.anakin.entities;
 
+import com.anakin.payloads.requests.AddBrandProductRequest;
+import com.anakin.payloads.requests.AddBrandRequest;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Builder
@@ -32,7 +31,19 @@ public class Product {
     private Date dateAdded;
     @UpdateTimestamp
     private Date dateUpdated;
-    private Integer brandId;
+    @OneToOne
+    @JoinColumn(name="brand_id")
+    private Brand brand;
+    private Integer userId;
+
+    public Product(AddBrandProductRequest addBrandProductRequest){
+        this.name= addBrandProductRequest.getName();
+        this.description = addBrandProductRequest.getDescription();
+        this.price= addBrandProductRequest.getPrice();
+        this.imageUrl = addBrandProductRequest.getImageUrl();
+        this.brand = addBrandProductRequest.getBrand();
+        this.userId = addBrandProductRequest.getUserId();
+    }
 
 }
 

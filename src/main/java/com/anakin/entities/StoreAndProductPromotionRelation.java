@@ -1,12 +1,11 @@
 package com.anakin.entities;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 
@@ -21,10 +20,17 @@ public class StoreAndProductPromotionRelation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer storeAndProductPromotionRelationId;
-    private Integer promotionId;
+    @JoinColumn(name="store_and_product_relation_id")
+    @OneToOne
+    private StoreAndProductRelation storeAndProductRelation;
+
+    @JoinColumn(name="promotion_id")
+    @OneToOne
+    private Promotion promotion;
     private Integer statusId;
+    @CreationTimestamp
     private Date dateAdded;
+    @UpdateTimestamp
     private Date dateUpdated;
 
 }

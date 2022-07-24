@@ -30,7 +30,6 @@ public class Promotion {
     private Double discountFixed;
     private Date startDate;
     private Date endDate;
-    private Integer productId;
     private Date dateAdded;
     private Date dateUpdated;
     private Integer statusId;
