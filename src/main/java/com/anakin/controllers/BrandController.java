@@ -2,10 +2,13 @@ package com.anakin.controllers;
 
 import com.anakin.entities.Brand;
 import com.anakin.entities.Product;
+import com.anakin.entities.User;
 import com.anakin.payloads.requests.AddBrandProductRequest;
 import com.anakin.payloads.requests.AddBrandRequest;
 import com.anakin.payloads.responses.AddBrandProductResponse;
 import com.anakin.payloads.responses.AddBrandResponse;
+import com.anakin.repositories.UserRepository;
+import com.anakin.security.JwtTokenUtil;
 import com.anakin.services.BrandService;
 import com.anakin.services.ProductService;
 import com.anakin.services.impl.UserServiceImpl;
@@ -26,6 +29,11 @@ public class BrandController {
     @Autowired
     ProductService productService;
 
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
     Logger logger = LoggerFactory.getLogger(BrandController.class);
 
     @GetMapping("/all")
@@ -38,15 +46,21 @@ public class BrandController {
     }
     @PostMapping("/add")
     public AddBrandResponse addBrand(@RequestHeader(name = "Authorization") String authToken, @RequestBody AddBrandRequest addBrandRequest){
-        Integer userId = TokenUtil.getUserIdFromToken(authToken);
-        System.out.println(authToken);
-        addBrandRequest.setUserId(userId);
+        String jwtToken = jwtTokenUtil.getJwtTokenString(authToken);
+        String userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        User user = userRepository.findByUserName(userName);
+        logger.info(authToken);
+        logger.info(jwtToken);
+        addBrandRequest.setUserId(user.getUserId());
         return brandService.addBrand(addBrandRequest);
     }
     @PostMapping("/product/add")
     public AddBrandProductResponse addBrandProduct(@RequestHeader(name = "Authorization") String authToken, @RequestBody AddBrandProductRequest addBrandProductRequest){
-        Integer userId = TokenUtil.getUserIdFromToken(authToken);
-        addBrandProductRequest.setUserId(userId);
+        String jwtToken = jwtTokenUtil.getJwtTokenString(authToken);
+        String userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        User user = userRepository.findByUserName(userName);
+        logger.debug(authToken);
+        addBrandProductRequest.setUserId(user.getUserId());
         return brandService.addBrandProduct(addBrandProductRequest);
     }
 }

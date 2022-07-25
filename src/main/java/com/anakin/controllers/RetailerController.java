@@ -1,10 +1,13 @@
 package com.anakin.controllers;
 
 import com.anakin.entities.Retailer;
+import com.anakin.entities.User;
 import com.anakin.payloads.requests.AddRetailerRequest;
 import com.anakin.payloads.requests.AddRetailerStoreRequest;
 import com.anakin.payloads.responses.AddRetailerResponse;
 import com.anakin.payloads.responses.AddRetailerStoreResponse;
+import com.anakin.repositories.UserRepository;
+import com.anakin.security.JwtTokenUtil;
 import com.anakin.services.RetailerService;
 import com.anakin.utils.TokenUtil;
 import org.slf4j.Logger;
@@ -19,6 +22,10 @@ import java.util.List;
 public class RetailerController {
     @Autowired
     RetailerService retailerService;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     Logger logger = LoggerFactory.getLogger(RetailerController.class);
 
@@ -29,14 +36,20 @@ public class RetailerController {
 
     @PostMapping("/add")
     public AddRetailerResponse addRetailer(@RequestHeader(name = "Authorization") String authToken, @RequestBody AddRetailerRequest addRetailerRequest){
-        Integer userId = TokenUtil.getUserIdFromToken(authToken);
-        addRetailerRequest.setUserId(userId);
+        String jwtToken = jwtTokenUtil.getJwtTokenString(authToken);
+        String userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        User user = userRepository.findByUserName(userName);
+        logger.debug(authToken);
+        addRetailerRequest.setUserId(user.getUserId());
         return retailerService.addRetailer(addRetailerRequest);
     }
     @PostMapping("/seller/add")
     public AddRetailerStoreResponse addStore(@RequestHeader(name = "Authorization") String authToken, @RequestBody AddRetailerStoreRequest addRetailerStoreRequest){
-        Integer userId = TokenUtil.getUserIdFromToken(authToken);
-        addRetailerStoreRequest.setUserId(userId);
+        String jwtToken = jwtTokenUtil.getJwtTokenString(authToken);
+        String userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        User user = userRepository.findByUserName(userName);
+        logger.debug(authToken);
+        addRetailerStoreRequest.setUserId(user.getUserId());
         return retailerService.addStore(addRetailerStoreRequest);
     }
 
