@@ -73,7 +73,6 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
     public AddProductToStoreResponse addProduct(AddProductToStoreRequest addProductToStoreRequest) {
         AddProductToStoreResponse addProductToStoreResponse = null;
         Optional<Store> store = storeRepository.findById(addProductToStoreRequest.getStoreId());
@@ -101,7 +100,6 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
     public StoreAndProductPromotionRelation addPromotion(AddStoreProductPromotionRequest addStoreProductPromotionRequest) {
         StoreAndProductPromotionRelation storeAndProductPromotionRelation = null;
         Promotion promotion = promotionRepository.findById(addStoreProductPromotionRequest.getPromotionId()).get();
