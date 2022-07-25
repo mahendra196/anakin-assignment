@@ -8,7 +8,10 @@ import com.anakin.payloads.responses.AddBrandProductResponse;
 import com.anakin.payloads.responses.AddBrandResponse;
 import com.anakin.services.BrandService;
 import com.anakin.services.ProductService;
+import com.anakin.services.impl.UserServiceImpl;
 import com.anakin.utils.TokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +25,8 @@ public class BrandController {
     BrandService brandService;
     @Autowired
     ProductService productService;
+
+    Logger logger = LoggerFactory.getLogger(BrandController.class);
 
     @GetMapping("/all")
     public List<Brand> getAllBrands(){

@@ -5,6 +5,8 @@ import com.anakin.entities.Store;
 import com.anakin.models.ProductSellingStoresDetails;
 import com.anakin.services.ProductService;
 import com.anakin.services.StoreService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,8 @@ public class ProductController {
     ProductService productService;
     @Autowired
     StoreService storeService;
+
+    Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     @GetMapping("/all")
     List<Product> getAllProducts(@RequestHeader(name = "Authorization") String authToken, @RequestParam Integer pageNo){

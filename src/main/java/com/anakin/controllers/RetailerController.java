@@ -7,6 +7,8 @@ import com.anakin.payloads.responses.AddRetailerResponse;
 import com.anakin.payloads.responses.AddRetailerStoreResponse;
 import com.anakin.services.RetailerService;
 import com.anakin.utils.TokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,8 @@ import java.util.List;
 public class RetailerController {
     @Autowired
     RetailerService retailerService;
+
+    Logger logger = LoggerFactory.getLogger(RetailerController.class);
 
     @GetMapping("/all")
     List<Retailer> getAllRetailers(){
