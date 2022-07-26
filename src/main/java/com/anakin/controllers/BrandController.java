@@ -2,9 +2,11 @@ package com.anakin.controllers;
 
 import com.anakin.entities.Brand;
 import com.anakin.entities.Product;
+import com.anakin.entities.Promotion;
 import com.anakin.entities.User;
 import com.anakin.payloads.requests.AddBrandProductRequest;
 import com.anakin.payloads.requests.AddBrandRequest;
+import com.anakin.payloads.requests.CreatePromotionRequest;
 import com.anakin.payloads.responses.AddBrandProductResponse;
 import com.anakin.payloads.responses.AddBrandResponse;
 import com.anakin.repositories.UserRepository;
@@ -62,5 +64,9 @@ public class BrandController {
         logger.debug(authToken);
         addBrandProductRequest.setUserId(user.getUserId());
         return brandService.addBrandProduct(addBrandProductRequest);
+    }
+    @PostMapping("/promotion/create")
+    Promotion createPromotion(@RequestHeader(name = "Authorization") String authToken, @RequestBody CreatePromotionRequest createPromotionRequest){
+        return brandService.createPromotion(createPromotionRequest);
     }
 }

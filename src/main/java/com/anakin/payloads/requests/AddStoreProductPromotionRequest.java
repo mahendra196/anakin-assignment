@@ -15,4 +15,5 @@ public class AddStoreProductPromotionRequest implements Serializable {
     private Integer promotionId;
     private Integer storeId;
     private Integer productId;
+    private Integer userId;
 }

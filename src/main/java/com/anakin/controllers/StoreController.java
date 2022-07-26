@@ -1,5 +1,6 @@
 package com.anakin.controllers;
 
+import com.anakin.entities.Promotion;
 import com.anakin.entities.StoreAndProductPromotionRelation;
 import com.anakin.entities.User;
 import com.anakin.payloads.requests.AddProductToStoreRequest;
@@ -39,6 +40,7 @@ public class StoreController {
         String jwtToken = jwtTokenUtil.getJwtTokenString(authToken);
         String userName = jwtTokenUtil.getUsernameFromToken(jwtToken);
         User user = userRepository.findByUserName(userName);
+        addStoreProductPromotionRequest.setUserId(user.getUserId());
         logger.debug(authToken);
         return storeService.addPromotion(addStoreProductPromotionRequest);
     }

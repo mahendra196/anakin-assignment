@@ -1,5 +1,6 @@
 package com.anakin.services.impl;
 
+import com.anakin.controllers.StoreController;
 import com.anakin.entities.*;
 import com.anakin.models.ProductSellingStoresDetails;
 import com.anakin.models.StoreWithPromotionDTO;
@@ -7,7 +8,10 @@ import com.anakin.payloads.requests.AddProductToStoreRequest;
 import com.anakin.payloads.requests.AddStoreProductPromotionRequest;
 import com.anakin.payloads.responses.AddProductToStoreResponse;
 import com.anakin.repositories.*;
+import com.anakin.services.SendEmailNotificationService;
 import com.anakin.services.StoreService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +36,13 @@ public class StoreServiceImpl implements StoreService {
 
     @Autowired
     PromotionRepository promotionRepository;
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    SendEmailNotificationService sendEmailNotificationService;
+
+    Logger logger = LoggerFactory.getLogger(StoreServiceImpl.class);
 
     @Override
     public List<Store> getAllStores() {
@@ -105,15 +116,28 @@ public class StoreServiceImpl implements StoreService {
         Promotion promotion = promotionRepository.findById(addStoreProductPromotionRequest.getPromotionId()).get();
         Product product = productRepository.findById(addStoreProductPromotionRequest.getProductId()).get();
         Store store = storeRepository.findById(addStoreProductPromotionRequest.getStoreId()).get();
+        User user = userRepository.findById(addStoreProductPromotionRequest.getUserId()).get();
         if (product != null && store != null && promotion != null) {
             StoreAndProductRelation storeAndProductRelation = storeAndProductRelationRepository.findByProductAndStoreAndStatusId(product, store, 1);
             if (storeAndProductRelation != null) {
                 storeAndProductPromotionRelation = new StoreAndProductPromotionRelation();
                 storeAndProductPromotionRelation.setPromotion(promotion);
                 storeAndProductPromotionRelation.setStoreAndProductRelation(storeAndProductRelation);
+                storeAndProductPromotionRelation.setStatusId(1);
                 storeAndProductPromotionRelation = storeAndProductPromotionRelationRepository.save(storeAndProductPromotionRelation);
+                if(user.getEmail() != null){
+                    sendEmailNotification(user, product, store, promotion);
+                    logger.info("Mail notification sent!!");
+                }
             }
         }
         return storeAndProductPromotionRelation;
+    }
+
+    private void sendEmailNotification(User user, Product product, Store store, Promotion promotion) {
+        String to = user.getEmail();
+        String subject = "Product price dropped by: "+promotion.getDiscountPercentage() +"% at store: "+ store.getName();
+        String body = "Hello there,\nPromotion is added on product: "+product.getName()+".\nNote:-This is system generated email from brand service please don't reply. \n\n Thanks,\nAdmin Brand-Service";
+        sendEmailNotificationService.sendMail(to, subject, body);
     }
 }

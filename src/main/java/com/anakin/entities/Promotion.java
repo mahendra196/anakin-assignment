@@ -1,5 +1,6 @@
 package com.anakin.entities;
 
+import com.anakin.payloads.requests.CreatePromotionRequest;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
@@ -37,6 +38,13 @@ public class Promotion {
     @UpdateTimestamp
     private Date dateUpdated;
     private Integer statusId;
+
+    public Promotion(CreatePromotionRequest createPromotionRequest){
+        this.title= createPromotionRequest.getTitle();
+        this.description=createPromotionRequest.getDescription();
+        this.isPercentageDiscount =createPromotionRequest.getIsPercentageDiscount();
+        this.discountPercentage=createPromotionRequest.getDiscountPercentage();
+    }
 
 }
 
